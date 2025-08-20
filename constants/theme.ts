@@ -7,14 +7,14 @@ import { Platform } from "react-native";
 
 export const Colors = {
   light: {
-    text: "#11181C",
+    text: "#13181C",
     background: "#F5F5F5",
     card: "#FFFFFF",
     tray: "#FFFFFF",
     baseTray: "#FFFFFF",
   },
   dark: {
-    text: "#ECEDEE",
+    text: "#FFFFFF",
     background: "#151517",
     card: "#1C1C1E",
     tray: "#2C2C2E",
