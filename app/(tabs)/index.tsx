@@ -1,20 +1,25 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
+import PreviewBase from "@/components/preview-base";
+import { Link } from "expo-router";
 
 export default function Tab() {
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="title">Home Screen</ThemedText>
-    </ThemedView>
+    <PreviewBase>
+      <View style={styles.container}>
+        <ThemedText type="title">Home Screen</ThemedText>
+        <Link href={"/modal"}>Open Modal</Link>
+      </View>
+    </PreviewBase>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
+    minHeight: 1000,
     alignItems: "center",
-    justifyContent: "center",
+    // justifyContent: "center",
     padding: 20,
   },
 });
