@@ -15,6 +15,7 @@ import Animated, {
   useSharedValue,
 } from "react-native-reanimated";
 import { ThemedText } from "./themed-text";
+import Button from "./ui/Button";
 
 export const SPRING_CONFIG = {
   damping: 26,
@@ -93,7 +94,6 @@ export default function PreviewBase({
 }
 
 const PreviewTray = ({ progress }: { progress: SharedValue<number> }) => {
-  const bg = useThemeColor("background");
   const text = useThemeColor("text");
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -117,8 +117,12 @@ const PreviewTray = ({ progress }: { progress: SharedValue<number> }) => {
           <ThemedView colorName="tray" style={styles.floatingTray}>
             <View style={styles.innerTray}>
               <ThemedText type="title" style={styles.title}>
-                Preview{" "}
+                Preview
               </ThemedText>
+              <View style={styles.buttonContainer}>
+                <Button title="New Document" />
+                <Button title="Scan Documents" />
+              </View>
             </View>
           </ThemedView>
         </View>
@@ -172,11 +176,16 @@ const styles = StyleSheet.create({
   },
   innerTray: {
     flex: 0.5,
-    padding: 16,
+    padding: 24,
     alignItems: "center",
     justifyContent: "center",
+    gap: 32,
   },
   title: {
     fontSize: 62,
+  },
+  buttonContainer: {
+    width: "100%",
+    gap: 8,
   },
 });

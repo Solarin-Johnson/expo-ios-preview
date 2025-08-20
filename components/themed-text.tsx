@@ -46,6 +46,7 @@ const styles = StyleSheet.create({
   },
   defaultSemiBold: {
     fontSize: 17,
+    fontWeight: "500",
   },
   title: {
     fontSize: 32,
