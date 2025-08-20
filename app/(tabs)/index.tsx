@@ -8,7 +8,7 @@ export default function Tab() {
     <PreviewBase>
       <View style={styles.container}>
         <ThemedText type="title">Home Screen</ThemedText>
-        <Link href={"/modal"}>Open Modal</Link>
+        {/* <Link href={"/modal"}>Open Modal</Link> */}
       </View>
     </PreviewBase>
   );
