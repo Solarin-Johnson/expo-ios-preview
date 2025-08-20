@@ -1,10 +1,20 @@
-import { View, Text } from "react-native";
-import React from "react";
+import { StyleSheet } from "react-native";
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
 
-export default function Browse() {
+export default function Tab() {
   return (
-    <View>
-      <Text>Browse</Text>
-    </View>
+    <ThemedView style={styles.container}>
+      <ThemedText type="title">Browse Screen</ThemedText>
+    </ThemedView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+  },
+});
