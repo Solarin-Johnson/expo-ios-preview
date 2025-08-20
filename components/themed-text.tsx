@@ -1,60 +1,65 @@
-import { StyleSheet, Text, type TextProps } from 'react-native';
+import { StyleSheet, Text, type TextProps } from "react-native";
 
-import { useThemeColor } from '@/hooks/use-theme-color';
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { Colors } from "@/constants/theme";
+import { cloneElement, ReactElement } from "react";
 
 export type ThemedTextProps = TextProps & {
-  lightColor?: string;
-  darkColor?: string;
-  type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link';
+  type?: "default" | "title" | "defaultSemiBold" | "subtitle" | "link" | "bold";
+  colorName?: keyof typeof Colors.light & keyof typeof Colors.dark;
 };
 
 export function ThemedText({
   style,
-  lightColor,
-  darkColor,
-  type = 'default',
+  type = "default",
+  colorName = "text",
   ...rest
 }: ThemedTextProps) {
-  const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
+  const color = useThemeColor(colorName);
+  const variantKey = type as keyof typeof styles;
 
-  return (
-    <Text
-      style={[
-        { color },
-        type === 'default' ? styles.default : undefined,
-        type === 'title' ? styles.title : undefined,
-        type === 'defaultSemiBold' ? styles.defaultSemiBold : undefined,
-        type === 'subtitle' ? styles.subtitle : undefined,
-        type === 'link' ? styles.link : undefined,
-        style,
-      ]}
-      {...rest}
-    />
-  );
+  return <Text style={[{ color }, styles[variantKey], style]} {...rest} />;
+}
+
+export function ThemedTextWrapper({
+  children,
+  type = "default",
+  colorName = "text",
+  style,
+  ignoreStyle,
+  ...rest
+}: ThemedTextProps & { children: ReactElement<any>; ignoreStyle?: boolean }) {
+  const color = useThemeColor(colorName);
+  const variantKey = type as keyof typeof styles;
+
+  const combinedStyle = [{ color }, !ignoreStyle && styles[variantKey], style];
+
+  return cloneElement(children, {
+    style: [(children.props as any).style ?? {}, ...combinedStyle],
+    ...rest,
+  });
 }
 
 const styles = StyleSheet.create({
   default: {
     fontSize: 16,
-    lineHeight: 24,
   },
   defaultSemiBold: {
-    fontSize: 16,
-    lineHeight: 24,
-    fontWeight: '600',
+    fontSize: 17,
   },
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
-    lineHeight: 32,
+    fontWeight: "500",
   },
   subtitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 15,
   },
   link: {
     lineHeight: 30,
     fontSize: 16,
-    color: '#0a7ea4',
+    color: "#0a7ea4",
+  },
+  bold: {
+    fontSize: 16,
   },
 });
