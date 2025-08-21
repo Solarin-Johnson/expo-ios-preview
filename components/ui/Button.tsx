@@ -1,14 +1,20 @@
-import { Text, TouchableOpacity, StyleSheet } from "react-native";
-import React from "react";
-import { ThemedViewWrapper } from "../themed-view";
+import {
+  TouchableOpacity,
+  StyleSheet,
+  ViewStyle,
+  StyleProp,
+} from "react-native";
+import React, { ReactElement } from "react";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { ThemedText } from "../themed-text";
+import { ThemedText, ThemedTextWrapper } from "../themed-text";
 
 interface ButtonProps {
-  title: string;
+  title?: string;
+  children?: ReactElement;
+  style?: StyleProp<ViewStyle>;
 }
 
-export default function Button({ title }: ButtonProps) {
+export default function Button({ title, children, style }: ButtonProps) {
   const text = useThemeColor("text");
   const card = useThemeColor("card");
 
@@ -20,12 +26,20 @@ export default function Button({ title }: ButtonProps) {
           borderColor: text + "20",
           backgroundColor: card + "BB",
         },
+        style,
       ]}
       activeOpacity={0.7}
     >
-      <ThemedText type="defaultSemiBold" style={[styles.text, { color: text }]}>
-        {title}
-      </ThemedText>
+      {children ? (
+        <ThemedTextWrapper>{children}</ThemedTextWrapper>
+      ) : (
+        <ThemedText
+          type="defaultSemiBold"
+          style={[styles.text, { color: text }]}
+        >
+          {title}
+        </ThemedText>
+      )}
     </TouchableOpacity>
   );
 }

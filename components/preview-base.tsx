@@ -1,10 +1,13 @@
 import { StyleSheet, useWindowDimensions, View } from "react-native";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useRef } from "react";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { ThemedView } from "./themed-view";
 import { BlurView } from "expo-blur";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import Animated, {
   Extrapolation,
   interpolate,
@@ -18,6 +21,7 @@ import { ThemedText } from "./themed-text";
 import Button from "./ui/Button";
 import { useSharedContext } from "@/context/shared-context";
 import { useFocusEffect } from "expo-router";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 export const SPRING_CONFIG = {
   damping: 26,
@@ -26,10 +30,15 @@ export const SPRING_CONFIG = {
 };
 
 const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
+const AnimatedBottomSheetScrollView = Animated.createAnimatedComponent(
+  BottomSheetScrollView
+);
 
 const PARRALAX_FACTOR = 150;
 const MIN_INTENSITY = 54;
 const MAX_INTENSITY = 120;
+const HEADER_HEIGHT = 72;
+const BOTTOM_INSET = 92;
 
 export default function PreviewBase({
   children,
@@ -37,6 +46,7 @@ export default function PreviewBase({
   children: React.ReactNode;
 }) {
   const { fullscreen } = useSharedContext();
+  const { top } = useSafeAreaInsets();
   const bottomSheetRef = useRef<BottomSheet>(null);
   const card = useThemeColor("card");
   const animatedPosition = useSharedValue(0);
@@ -83,6 +93,17 @@ export default function PreviewBase({
     }
   );
 
+  const scrollAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      paddingTop: interpolate(
+        animatedProgress.value,
+        [0, 1],
+        [HEADER_HEIGHT, HEADER_HEIGHT + top / 1.5],
+        Extrapolation.CLAMP
+      ),
+    };
+  });
+
   return (
     <ThemedView style={styles.container}>
       <PreviewTray progress={animatedProgress} />
@@ -105,12 +126,14 @@ export default function PreviewBase({
           <AnimatedBlurView style={style} intensity={intensity} />
         )}
       >
-        <BottomSheetScrollView
-          style={styles.container}
+        <Header progress={animatedProgress} />
+        <AnimatedBottomSheetScrollView
+          style={[styles.container, scrollAnimatedStyle]}
           contentContainerStyle={styles.contentContainer}
+          scrollIndicatorInsets={{ top, bottom: BOTTOM_INSET }}
         >
           {children}
-        </BottomSheetScrollView>
+        </AnimatedBottomSheetScrollView>
       </BottomSheet>
     </ThemedView>
   );
@@ -154,18 +177,46 @@ const PreviewTray = ({ progress }: { progress: SharedValue<number> }) => {
   );
 };
 
-const Header = () => {
-  const text = useThemeColor("text");
+const Header = ({ progress }: { progress: SharedValue<number> }) => {
+  const { top } = useSafeAreaInsets();
+  const card = useThemeColor("card");
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      height: interpolate(
+        progress.value,
+        [0, 1],
+        [HEADER_HEIGHT, HEADER_HEIGHT + top / 2],
+        Extrapolation.CLAMP
+      ),
+      paddingTop: interpolate(
+        progress.value,
+        [0, 1],
+        [0, top],
+        Extrapolation.CLAMP
+      ),
+    };
+  });
 
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="title" style={styles.title}>
-        Preview
-      </ThemedText>
-      <ThemedText type="subtitle" style={{ color: text + "80" }}>
-        View your documents here
-      </ThemedText>
-    </ThemedView>
+    <Animated.View
+      style={[
+        styles.headerWrapper,
+        {
+          experimental_backgroundImage: `linear-gradient(to bottom, ${card}BB, ${card}00)`,
+        },
+        animatedStyle,
+      ]}
+    >
+      <View style={[styles.header]}>
+        <Button style={styles.headerBtn}>
+          <Ionicons name="ellipsis-horizontal" size={23} />
+        </Button>
+        <Button style={styles.headerBtn}>
+          <Ionicons name="search" size={23} />
+        </Button>
+      </View>
+    </Animated.View>
   );
 };
 
@@ -175,7 +226,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flexGrow: 1,
-    alignItems: "center",
+    paddingBottom: BOTTOM_INSET,
   },
   bgStyle: {
     width: "100.4%",
@@ -225,5 +276,31 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: "100%",
     gap: 8,
+  },
+  headerWrapper: {
+    position: "absolute",
+    borderTopRightRadius: 36,
+    borderTopLeftRadius: 36,
+    width: "100%",
+    height: HEADER_HEIGHT,
+    top: 0,
+    zIndex: 1000,
+    overflow: "hidden",
+    justifyContent: "center",
+  },
+  header: {
+    padding: 16,
+    gap: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    width: "100%",
+  },
+  headerBtn: {
+    width: 40,
+    padding: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    aspectRatio: 1,
   },
 });

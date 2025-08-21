@@ -16,6 +16,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    padding: 20,
+    // padding: 16,
+    minHeight: 1000,
+    // backgroundColor: "red",
   },
 });
