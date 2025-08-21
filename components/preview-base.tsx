@@ -58,9 +58,7 @@ export default function PreviewBase({
     return Math.min(progress, 1);
   });
 
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log("handleSheetChanges", index);
-  }, []);
+  const handleSheetChanges = useCallback((index: number) => {}, []);
 
   const toggleBottomSheet = useCallback(() => {
     if (fullscreen.value) {
