@@ -11,6 +11,7 @@ import {
 import Animated, {
   Extrapolation,
   interpolate,
+  interpolateColor,
   SharedValue,
   useAnimatedReaction,
   useAnimatedStyle,
@@ -22,6 +23,7 @@ import Button from "./ui/Button";
 import { useSharedContext } from "@/context/shared-context";
 import { useFocusEffect } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { hexToRgba } from "@/functions";
 
 export const SPRING_CONFIG = {
   damping: 26,
@@ -35,8 +37,8 @@ const AnimatedBottomSheetScrollView = Animated.createAnimatedComponent(
 );
 
 const PARRALAX_FACTOR = 150;
-const MIN_INTENSITY = 54;
-const MAX_INTENSITY = 120;
+const MIN_INTENSITY = 42;
+const MAX_INTENSITY = 100;
 const HEADER_HEIGHT = 72;
 const BOTTOM_INSET = 92;
 
@@ -51,6 +53,7 @@ export default function PreviewBase({
   const card = useThemeColor("card");
   const animatedPosition = useSharedValue(0);
   const { height } = useWindowDimensions();
+  const cardBg = hexToRgba(card, 0.4);
   const intensity = useSharedValue<number | undefined>(24);
   const animatedProgress = useDerivedValue(() => {
     const progress = 1 - animatedPosition.value / height / 0.5;
@@ -111,19 +114,14 @@ export default function PreviewBase({
         ref={bottomSheetRef}
         onChange={handleSheetChanges}
         animatedPosition={animatedPosition}
-        backgroundStyle={[
-          styles.bgStyle,
-          {
-            backgroundColor: card + "AB",
-          },
-        ]}
+        backgroundStyle={[styles.bgStyle, { backgroundColor: cardBg }]}
         handleComponent={() => null}
         snapPoints={["50%", "100%"]}
         overDragResistanceFactor={3}
         animationConfigs={SPRING_CONFIG}
         topInset={-1}
         backgroundComponent={({ style }) => (
-          <AnimatedBlurView style={style} intensity={intensity} />
+          <AnimatedBlurView style={[style]} intensity={intensity} />
         )}
       >
         <Header progress={animatedProgress} />
@@ -154,7 +152,7 @@ const PreviewTray = ({ progress }: { progress: SharedValue<number> }) => {
 
   return (
     <Animated.View style={[styles.container, animatedStyle]}>
-      <SafeAreaView style={styles.trayContainer}>
+      <SafeAreaView style={styles.trayContainer} edges={["top"]}>
         <View style={styles.container}>
           <ThemedView
             colorName="baseTray"
@@ -241,6 +239,7 @@ const styles = StyleSheet.create({
   trayContainer: {
     flex: 1,
     padding: 12,
+    paddingBottom: 0,
   },
   baseTray: {
     flex: 1,
@@ -266,6 +265,7 @@ const styles = StyleSheet.create({
   innerTray: {
     flex: 0.5,
     padding: 24,
+    paddingBottom: 48,
     alignItems: "center",
     justifyContent: "center",
     gap: 32,
