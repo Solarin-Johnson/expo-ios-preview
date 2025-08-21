@@ -11,7 +11,6 @@ import {
 import Animated, {
   Extrapolation,
   interpolate,
-  interpolateColor,
   SharedValue,
   useAnimatedReaction,
   useAnimatedStyle,
@@ -24,6 +23,7 @@ import { useSharedContext } from "@/context/shared-context";
 import { useFocusEffect } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { hexToRgba } from "@/functions";
+import { BOTTOM_INSET, HEADER_HEIGHT } from "@/constants";
 
 export const SPRING_CONFIG = {
   damping: 26,
@@ -39,15 +39,13 @@ const AnimatedBottomSheetScrollView = Animated.createAnimatedComponent(
 const PARRALAX_FACTOR = 150;
 const MIN_INTENSITY = 42;
 const MAX_INTENSITY = 100;
-const HEADER_HEIGHT = 72;
-const BOTTOM_INSET = 92;
 
 export default function PreviewBase({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { fullscreen } = useSharedContext();
+  const { fullscreen, progress: _progress } = useSharedContext();
   const { top } = useSafeAreaInsets();
   const bottomSheetRef = useRef<BottomSheet>(null);
   const card = useThemeColor("card");
@@ -78,14 +76,11 @@ export default function PreviewBase({
     }, [toggleBottomSheet])
   );
 
-  useDerivedValue(() => {
-    console.log(fullscreen.value);
-  });
-
   useAnimatedReaction(
     () => animatedProgress.value,
     (progress) => {
       fullscreen.value = progress > 0.5;
+      _progress.value = progress;
 
       intensity.value = interpolate(
         progress,
@@ -99,7 +94,7 @@ export default function PreviewBase({
   const scrollAnimatedStyle = useAnimatedStyle(() => {
     return {
       paddingTop: interpolate(
-        animatedProgress.value,
+        _progress.value,
         [0, 1],
         [HEADER_HEIGHT, HEADER_HEIGHT + top / 1.5],
         Extrapolation.CLAMP
@@ -120,6 +115,7 @@ export default function PreviewBase({
         overDragResistanceFactor={3}
         animationConfigs={SPRING_CONFIG}
         topInset={-1}
+        enableDynamicSizing={false}
         backgroundComponent={({ style }) => (
           <AnimatedBlurView style={[style]} intensity={intensity} />
         )}

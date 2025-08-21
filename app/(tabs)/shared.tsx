@@ -1,23 +1,10 @@
-import { StyleSheet, View } from "react-native";
-import { ThemedText } from "@/components/themed-text";
 import PreviewBase from "@/components/preview-base";
+import EmptyState from "@/components/empty-state";
 
 export default function Tab() {
   return (
     <PreviewBase>
-      <View style={styles.container}>
-        <ThemedText type="title">Shared Screen</ThemedText>
-      </View>
+      <EmptyState title={"Shared"} symbol="folder.fill.badge.person.crop" />
     </PreviewBase>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    // padding: 16,
-    minHeight: 1000,
-    // backgroundColor: "red",
-  },
-});

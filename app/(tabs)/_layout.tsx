@@ -1,5 +1,4 @@
 import { NativeTabs, Icon, Label } from "expo-router/unstable-native-tabs";
-import Animated from "react-native-reanimated";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function TabLayout() {
