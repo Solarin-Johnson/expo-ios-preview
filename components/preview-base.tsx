@@ -1,4 +1,4 @@
-import { StyleSheet, useWindowDimensions, View } from "react-native";
+import { Alert, StyleSheet, useWindowDimensions, View } from "react-native";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { useCallback, useRef } from "react";
 import { useThemeColor } from "@/hooks/use-theme-color";
@@ -20,7 +20,7 @@ import Animated, {
 import { ThemedText } from "./themed-text";
 import Button from "./ui/Button";
 import { useSharedContext } from "@/context/shared-context";
-import { useFocusEffect } from "expo-router";
+import { Link, useFocusEffect } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { hexToRgba } from "@/functions";
 import { BOTTOM_INSET, HEADER_HEIGHT } from "@/constants";
@@ -144,6 +144,10 @@ const PreviewTray = ({ progress }: { progress: SharedValue<number> }) => {
     };
   });
 
+  const handleMenuActionPress = useCallback(() => {
+    Alert.alert("Menu action pressed");
+  }, []);
+
   return (
     <Animated.View style={[styles.container, animatedStyle]}>
       <SafeAreaView style={styles.trayContainer} edges={["top"]}>
@@ -158,8 +162,53 @@ const PreviewTray = ({ progress }: { progress: SharedValue<number> }) => {
                 Preview
               </ThemedText>
               <View style={styles.buttonContainer}>
-                <Button title="New Document" />
-                <Button title="Scan Documents" />
+                <Link href="/">
+                  <Link.Trigger>
+                    <Button title="New Document" />
+                  </Link.Trigger>
+                  <Link.Menu>
+                    <Link.MenuAction
+                      title="New Empty Image"
+                      icon="square.and.pencil"
+                      onPress={handleMenuActionPress}
+                    />
+                    <Link.MenuAction
+                      title="New from Clipboard"
+                      icon="doc.on.clipboard"
+                      disabled
+                      onPress={handleMenuActionPress}
+                    />
+                  </Link.Menu>
+                </Link>
+                <Link href="/">
+                  <Link.Trigger>
+                    <Button title="Scan Documents" />
+                  </Link.Trigger>
+                  <Link.Menu>
+                    <Link.MenuAction
+                      title="Single Page"
+                      icon="doc"
+                      onPress={handleMenuActionPress}
+                    />
+                    <Link.MenuAction
+                      title="Multiple Pages"
+                      icon="doc.on.doc"
+                      onPress={handleMenuActionPress}
+                    />
+                    <Link.Menu title="Import" icon="square.and.arrow.down">
+                      <Link.MenuAction
+                        title="From Photos"
+                        icon="photo"
+                        onPress={handleMenuActionPress}
+                      />
+                      <Link.MenuAction
+                        title="From Files"
+                        icon="folder"
+                        onPress={handleMenuActionPress}
+                      />
+                    </Link.Menu>
+                  </Link.Menu>
+                </Link>
               </View>
             </View>
           </ThemedView>
