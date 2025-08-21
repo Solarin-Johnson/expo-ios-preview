@@ -1,6 +1,6 @@
 import { StyleSheet, useWindowDimensions, View } from "react-native";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { ThemedView } from "./themed-view";
 import { BlurView } from "expo-blur";
@@ -16,6 +16,8 @@ import Animated, {
 } from "react-native-reanimated";
 import { ThemedText } from "./themed-text";
 import Button from "./ui/Button";
+import { useSharedContext } from "@/context/shared-context";
+import { useFocusEffect } from "expo-router";
 
 export const SPRING_CONFIG = {
   damping: 26,
@@ -26,7 +28,7 @@ export const SPRING_CONFIG = {
 const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
 
 const PARRALAX_FACTOR = 150;
-const MIN_INTENSITY = 64;
+const MIN_INTENSITY = 54;
 const MAX_INTENSITY = 120;
 
 export default function PreviewBase({
@@ -34,6 +36,7 @@ export default function PreviewBase({
 }: {
   children: React.ReactNode;
 }) {
+  const { fullscreen } = useSharedContext();
   const bottomSheetRef = useRef<BottomSheet>(null);
   const card = useThemeColor("card");
   const animatedPosition = useSharedValue(0);
@@ -48,9 +51,29 @@ export default function PreviewBase({
     console.log("handleSheetChanges", index);
   }, []);
 
+  const toggleBottomSheet = useCallback(() => {
+    if (fullscreen.value) {
+      bottomSheetRef.current?.expand({ duration: 0 });
+    } else {
+      bottomSheetRef.current?.collapse({ duration: 0 });
+    }
+  }, [fullscreen]);
+
+  useFocusEffect(
+    useCallback(() => {
+      toggleBottomSheet();
+    }, [toggleBottomSheet])
+  );
+
+  useDerivedValue(() => {
+    console.log(fullscreen.value);
+  });
+
   useAnimatedReaction(
     () => animatedProgress.value,
     (progress) => {
+      fullscreen.value = progress > 0.5;
+
       intensity.value = interpolate(
         progress,
         [0, 1],
@@ -128,6 +151,21 @@ const PreviewTray = ({ progress }: { progress: SharedValue<number> }) => {
         </View>
       </SafeAreaView>
     </Animated.View>
+  );
+};
+
+const Header = () => {
+  const text = useThemeColor("text");
+
+  return (
+    <ThemedView style={styles.container}>
+      <ThemedText type="title" style={styles.title}>
+        Preview
+      </ThemedText>
+      <ThemedText type="subtitle" style={{ color: text + "80" }}>
+        View your documents here
+      </ThemedText>
+    </ThemedView>
   );
 };
 
